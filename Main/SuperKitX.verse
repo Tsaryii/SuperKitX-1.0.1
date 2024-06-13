@@ -32,12 +32,17 @@ using { /UnrealEngine.com/Temporary/Curves }
                      Youtube Channel: Youtube.com/@TsarShorts                                   #> 
 GameManagementHost:=module{
 SuperKitX := class(creative_device):
+
+
     var PlayersMap:[agent]CustomPlayer = map{}
+    @editable Team1Spawners: []player_spawner_device = array{}
     var GlobalUserUniqueID:int = 1
     var Hashed:logic = false
     @editable var UniqueHash: int = 0
     var AllPlayersMap : [player]PlayerStats = map{}
     var DefaultVal: int = 0
+    var Team1:Team=Team{}
+    var Team2:Team=Team{}
     @editable GlobalHudManagement:HudSys=HudSys{}
     @editable var Teams: []Team = array{}
     @editable DebugParams: DebugOddsClass = DebugOddsClass{DebugOccurence := option{95.0}}
@@ -51,7 +56,12 @@ SuperKitX := class(creative_device):
         #currency 3
         var CurrencyThreeName: [agent]?text_block = map{}
         var CurrencyThreeValue: [agent]?text_block = map{}
+    AwaitSpawn(Spawner:player_spawner_device, TeamToAdd:Team)<suspends>:void={loop{Agent := Spawner.SpawnedEvent.Await(); if(Player := player[Agent]){TeamToAdd.AddPlayer(Player)}}}
     OnBegin<override>()<suspends>:void=
+        for(T1S:Team1Spawners):
+            spawn{AwaitSpawn(T1S, Team1)}
+            
+        
         Hash:HashingAlgo = HashingAlgo{}
         Playspace := GetPlayspace().PlayerRemovedEvent().Subscribe(PlayerLeftManagement)
         set Hashed = Hash.Allow(UniqueHash)
@@ -278,17 +288,12 @@ SuperKitX := class(creative_device):
             Slots:=array:
                 canvas_slot:
                     Widget:=HostStackbox
-                    Anchors:=anchors{Minimum:= vector2{X := 0.0, Y := 0.0}; Maximum:= vector2{X := 1.0, Y := 1.0};}
-                    Offsets:=margin{Top :=-10.0,Left:=0.0,Bottom:=-450.0,Right:=0.0}
-        set MainCanvas=canvas:
-            Slots:=array:
-                canvas_slot:
-                    Widget:=SubCanvas
-                    Anchors:=anchors{Minimum:= vector2{X := 0.0, Y := 0.0}; Maximum:= vector2{X := 1.0, Y := 1.0};}
-                    Offsets:=margin{Top :=1201.713745,Left:=500.0,Bottom:=312.0,Right:=500.0}
+                    Anchors:=anchors{Minimum:= vector2{X := 0.2, Y := 0.817284}; Maximum:= vector2{X := 0.8, Y := 0.948407};}
+                    Offsets:=margin{Top :=-576.0,Left:=1.0,Bottom:=1149.0,Right:=12.0}
+                    SizeToContent:={true}
 
 
-        return MainCanvas
+        return SubCanvas
     }
     GetPlayerName(Player:player):message=
         PlayerName : message = PlayerNameToMessage(Player)
@@ -771,6 +776,12 @@ SuperKitX := class(creative_device):
                     MakePlayerStatsTable<constructor>(PlayerStatsTable)
                     MainGold := MakeUpdatedPlayerStat(GoldStat, ParsedValue)
         }
+    #Max range of 1 = k, 2 = M etc
+    ArrayGen:[]string=array{"", "K", "M", "B", "T"}
+    (Val:float).GetSuffix(MaxRange:int)<transacts><decides>:string={var s:string=""; for(i:=0..MaxRange){if(Val >= Pow(1000.0, i*1.0)){x:=ArrayGen[i];set s = x}}; s}
+           
+        
+
     RecordPlayerCoindDexStat(Agent:agent, Stat:stat_type, CoinIndex:int, CoinValue:int):void=
         AgentStats := GetAgentStats(Agent)
         if:
