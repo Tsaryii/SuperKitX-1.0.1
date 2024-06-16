@@ -127,9 +127,11 @@ SessionSavingClass:=class<concrete>():
      @editable var SaveAllCurrencyValues:logic=false
 
 Team:=class<concrete>():
+    var Players: []player = array{}
     var Claimed:logic=false
     var Owner: ?player = false
     var CashToClaim:int=0
+    AddPlayer(Player:player):void={if(not Players.Find[Player]){set Players += array{Player}}else{Print("This player was already apart of that team")}}
     @editable var TeamName: string = "My New Team"
     @editable Currencies: []string = array{"My Currency"}
     @editable BuyableProps: []BuyItem = array{}
@@ -250,4 +252,3 @@ Currency:=struct<concrete>():
     @editable Currencylist: []string = array{"My Currency"}
 Animations:=enum:
     EaseDown
-
