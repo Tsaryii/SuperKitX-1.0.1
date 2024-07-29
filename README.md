@@ -1,5 +1,5 @@
 # THIS KIT IS DEPRECATED
 
-GO TO -> https://github.com/Tsaryii/ProjectOST?tab=readme-ov-file
+NEW KIT -> https://github.com/Tsaryii/ProjectOST?tab=readme-ov-file
 
 
